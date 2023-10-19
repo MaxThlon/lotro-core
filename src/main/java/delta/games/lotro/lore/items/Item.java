@@ -8,6 +8,7 @@ import delta.games.lotro.character.classes.AbstractClassDescription;
 import delta.games.lotro.character.classes.ClassDescription;
 import delta.games.lotro.character.stats.BasicStatsSet;
 import delta.games.lotro.common.Interactable;
+import delta.games.lotro.common.effects.EffectGenerator;
 import delta.games.lotro.common.enums.EquipmentCategory;
 import delta.games.lotro.common.enums.ItemClass;
 import delta.games.lotro.common.money.Money;
@@ -16,6 +17,7 @@ import delta.games.lotro.common.stats.StatsProvider;
 import delta.games.lotro.common.utils.valueTables.QualityBasedValuesTable;
 import delta.games.lotro.lore.items.details.ItemDetail;
 import delta.games.lotro.lore.items.details.ItemDetailsManager;
+import delta.games.lotro.lore.items.essences.EssencesSlotsSetup;
 import delta.games.lotro.lore.items.scaling.Munging;
 import delta.games.lotro.lore.items.sets.ItemsSet;
 
@@ -26,11 +28,6 @@ import delta.games.lotro.lore.items.sets.ItemsSet;
 public class Item implements Interactable,ItemProvider
 {
   private static final Logger LOGGER=Logger.getLogger(Item.class);
-
-  /**
-   * Tier pattern.
-   */
-  private static final String TIER_PATTERN=":Tier";
 
   // Item identifier
   private int _identifier;
@@ -46,6 +43,8 @@ public class Item implements Interactable,ItemProvider
   private String _name;
   // Item class. Yields the category name.
   private ItemClass _itemClass;
+  // Tier
+  private Integer _tier;
   // Equipment category
   private EquipmentCategory _equipmentCategory;
   // Item binding: "Bind on Acquire", ...
@@ -56,7 +55,7 @@ public class Item implements Interactable,ItemProvider
   private BasicStatsSet _stats;
   private StatsProvider _statsProvider;
   // Essences
-  private int _essenceSlots;
+  private EssencesSlotsSetup _essenceSlots;
   // Durability
   private Integer _durability;
   // Sturdiness (may be null)
@@ -80,6 +79,8 @@ public class Item implements Interactable,ItemProvider
   private Munging _munging;
   // Other details
   private ItemDetailsManager _details;
+  // Effects
+  private ItemEffectsManager _effects;
 
   /**
    * Constructor.
@@ -97,7 +98,7 @@ public class Item implements Interactable,ItemProvider
     _unique=false;
     _stats=new BasicStatsSet();
     _statsProvider=null;
-    _essenceSlots=0;
+    _essenceSlots=null;
     _durability=null;
     _sturdiness=null;
     _requirements=new UsageRequirement();
@@ -109,6 +110,7 @@ public class Item implements Interactable,ItemProvider
     _quality=null;
     _munging=null;
     _details=null;
+    _effects=null;
   }
 
   @Override
@@ -288,6 +290,24 @@ public class Item implements Interactable,ItemProvider
   }
 
   /**
+   * Get the tier for this item.
+   * @return A tier or <code>null</code> if not found.
+   */
+  public Integer getTier()
+  {
+    return _tier;
+  }
+
+  /**
+   * Set the item tier.
+   * @param tier Tier to set.
+   */
+  public void setTier(Integer tier)
+  {
+    _tier=tier;
+  }
+
+  /**
    * Get the category of this item.
    * @return a sub-category.
    */
@@ -312,25 +332,6 @@ public class Item implements Interactable,ItemProvider
   public void setEquipmentCategory(EquipmentCategory equipmentCategory)
   {
     _equipmentCategory=equipmentCategory;
-  }
-
-  /**
-   * Get the tier for this item.
-   * @return A tier or <code>null</code> if not found.
-   */
-  public Integer getTier()
-  {
-    String subCategory=getSubCategory();
-    if (subCategory!=null)
-    {
-      int index=subCategory.indexOf(TIER_PATTERN);
-      if (index!=-1)
-      {
-        String tierStr=subCategory.substring(index+TIER_PATTERN.length());
-        return NumericTools.parseInteger(tierStr);
-      }
-    }
-    return null;
   }
 
   /**
@@ -417,14 +418,23 @@ public class Item implements Interactable,ItemProvider
    */
   public int getEssenceSlots()
   {
+    return (_essenceSlots!=null)?_essenceSlots.getSocketsCount():0;
+  }
+
+  /**
+   * Get the essences slots setup.
+   * @return A setup or <code>null</code> if no essence slots.
+   */
+  public EssencesSlotsSetup getEssenceSlotsSetup()
+  {
     return _essenceSlots;
   }
 
   /**
-   * Set the number of available essence slots.
-   * @param essenceSlots Slot count.
+   * Set the essence slots setup.
+   * @param essenceSlots Setup to set.
    */
-  public void setEssenceSlots(int essenceSlots)
+  public void setEssenceSlots(EssencesSlotsSetup essenceSlots)
   {
     _essenceSlots=essenceSlots;
   }
@@ -734,12 +744,12 @@ public class Item implements Interactable,ItemProvider
   }
 
   /**
-   * Set the item details manager.
-   * @param details Details to set.
+   * Get the effects manager.
+   * @return an effects manager or <code>null</code> if no effects.
    */
-  public void setDetails(ItemDetailsManager details)
+  public ItemEffectsManager getEffects()
   {
-    _details=details;
+    return _effects;
   }
 
   /**
@@ -768,11 +778,11 @@ public class Item implements Interactable,ItemProvider
       sb.append(_equipmentLocation);
       sb.append(')');
     }
-    if (_essenceSlots!=0)
+    if (_essenceSlots!=null)
     {
-      sb.append(" (");
-      sb.append(_essenceSlots);
-      sb.append(" slot(s))");
+      sb.append(" (slot(s): ");
+      sb.append(_essenceSlots.toPersistenceString());
+      sb.append(')');
     }
     {
       sb.append(" (");
@@ -877,8 +887,25 @@ public class Item implements Interactable,ItemProvider
     if (mgr==null)
     {
       mgr=new ItemDetailsManager();
-      item.setDetails(mgr);
+      item._details=mgr;
     }
     mgr.addItemDetail(detail);
+  }
+
+  /**
+   * Add an effect to the given item.
+   * @param item Item to use.
+   * @param type Use case.
+   * @param effect Effect to add.
+   */
+  public static void addEffect(Item item, ItemEffectsManager.Type type, EffectGenerator effect)
+  {
+    ItemEffectsManager mgr=item.getEffects();
+    if (mgr==null)
+    {
+      mgr=new ItemEffectsManager();
+      item._effects=mgr;
+    }
+    mgr.addEffect(type,effect);
   }
 }

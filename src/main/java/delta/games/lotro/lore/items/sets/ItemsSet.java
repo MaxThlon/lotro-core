@@ -268,6 +268,16 @@ public class ItemsSet implements Identifiable
   }
 
   /**
+   * Get the bonus for the given number of pieces.
+   * @param nbPieces Number of pieces.
+   * @return A set bonus or <code>null</code>.
+   */
+  public SetBonus getBonus(int nbPieces)
+  {
+    return _bonuses.get(Integer.valueOf(nbPieces));
+  }
+
+  /**
    * Add a bonus.
    * @param bonus Bonus to add.
    */
@@ -324,6 +334,6 @@ public class ItemsSet implements Identifiable
   @Override
   public String toString()
   {
-    return _name;
+    return _id+": "+_name+" ("+_setLevel+")";
   }
 }

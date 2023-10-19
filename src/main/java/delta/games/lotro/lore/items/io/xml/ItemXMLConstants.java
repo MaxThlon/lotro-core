@@ -52,6 +52,10 @@ public class ItemXMLConstants
    */
   public static final String ITEM_CLASS_ATTR="class";
   /**
+   * Tag 'item', attribute 'tier'.
+   */
+  public static final String ITEM_TIER_ATTR="tier";
+  /**
    * Tag 'item', attribute 'equipmentCategory'.
    */
   public static final String ITEM_EQUIPMENT_CATEGORY_ATTR="equipmentCategory";
@@ -183,6 +187,12 @@ public class ItemXMLConstants
    * Tag 'carryAll', attribute 'itemStackMax'.
    */
   public static final String CARRY_ALL_ITEM_STACK_MAX_ATTR="itemStackMax";
+
+  // Essence
+  /**
+   * Tag 'essence', attribute 'type='.
+   */
+  public static final String ESSENCE_TYPE_ATTR="type";
 
   /**
    * Tag 'stats'.

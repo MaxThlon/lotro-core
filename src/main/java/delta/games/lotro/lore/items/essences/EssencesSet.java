@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import delta.common.utils.text.EndOfLine;
+import delta.games.lotro.common.enums.SocketType;
 import delta.games.lotro.lore.items.Item;
 
 /**
@@ -12,7 +13,18 @@ import delta.games.lotro.lore.items.Item;
  */
 public class EssencesSet
 {
-  private List<Item> _essences;
+  private EssencesSlotsSetup _setup;
+  private List<Essence> _essences;
+
+  /**
+   * Constructor.
+   * @param setup Slots setup.
+   */
+  public EssencesSet(EssencesSlotsSetup setup)
+  {
+    this(setup.getSocketsCount());
+    _setup=setup;
+  }
 
   /**
    * Constructor.
@@ -20,7 +32,7 @@ public class EssencesSet
    */
   public EssencesSet(int size)
   {
-    _essences=new ArrayList<Item>();
+    _essences=new ArrayList<Essence>();
     for(int i=0;i<size;i++)
     {
       _essences.add(null);
@@ -33,7 +45,27 @@ public class EssencesSet
    */
   public EssencesSet(EssencesSet source)
   {
-    _essences=new ArrayList<Item>(source._essences);
+    _setup=source._setup;
+    _essences=new ArrayList<Essence>(source._essences);
+  }
+
+  /**
+   * Get the socket type for the given index. 
+   * @param index Index of socket to get, starting at 0.
+   * @return A socket type.
+   */
+  public SocketType getType(int index)
+  {
+    SocketType ret=null;
+    if (_setup!=null)
+    {
+      ret=_setup.getSlotType(index);
+    }
+    if (ret==null)
+    {
+      ret=SocketTypes.CLASSIC;
+    }
+    return ret;
   }
 
   /**
@@ -50,7 +82,7 @@ public class EssencesSet
    * @param index Index, starting at 0.
    * @return An essence or <code>null</code> if none set.
    */
-  public Item getEssence(int index)
+  public Essence getEssence(int index)
   {
     if (index<_essences.size())
     {
@@ -64,7 +96,7 @@ public class EssencesSet
    * @param index Index, starting at 0.
    * @param essence Essence to set.
    */
-  public void setEssence(int index, Item essence)
+  public void setEssence(int index, Essence essence)
   {
     if ((index>=0) && (index<_essences.size()))
     {

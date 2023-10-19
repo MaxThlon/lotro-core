@@ -31,6 +31,8 @@ import delta.games.lotro.lore.items.Weapon;
 import delta.games.lotro.lore.items.WeaponType;
 import delta.games.lotro.lore.items.carryalls.CarryAll;
 import delta.games.lotro.lore.items.details.io.xml.ItemDetailsXMLWriter;
+import delta.games.lotro.lore.items.essences.Essence;
+import delta.games.lotro.lore.items.essences.EssencesSlotsSetup;
 import delta.games.lotro.lore.items.legendary.Legendary;
 import delta.games.lotro.lore.items.legendary.LegendaryAttrs;
 import delta.games.lotro.lore.items.scaling.Munging;
@@ -158,6 +160,12 @@ public class ItemXMLWriter
     {
       itemAttrs.addAttribute("","",ItemXMLConstants.ITEM_CLASS_ATTR,XmlWriter.CDATA,String.valueOf(itemClass.getCode()));
     }
+    // Tier
+    Integer tier=item.getTier();
+    if (tier!=null)
+    {
+      itemAttrs.addAttribute("","",ItemXMLConstants.ITEM_TIER_ATTR,XmlWriter.CDATA,tier.toString());
+    }
     // Equipment category
     EquipmentCategory equipmentCategory=item.getEquipmentCategory();
     if (equipmentCategory!=null)
@@ -220,10 +228,11 @@ public class ItemXMLWriter
       itemAttrs.addAttribute("","",ItemXMLConstants.ITEM_STACK_MAX_ATTR,XmlWriter.CDATA,String.valueOf(stackMax.intValue()));
     }
     // Essence slot count
-    int nbEssenceSlots=item.getEssenceSlots();
-    if (nbEssenceSlots>0)
+    EssencesSlotsSetup setup=item.getEssenceSlotsSetup();
+    if (setup!=null)
     {
-      itemAttrs.addAttribute("","",ItemXMLConstants.ITEM_ESSENCE_SLOTS_ATTR,XmlWriter.CDATA,String.valueOf(nbEssenceSlots));
+      String setupStr=setup.toPersistenceString();
+      itemAttrs.addAttribute("","",ItemXMLConstants.ITEM_ESSENCE_SLOTS_ATTR,XmlWriter.CDATA,setupStr);
     }
     // Munging
     Munging munging=item.getMunging();
@@ -303,7 +312,7 @@ public class ItemXMLWriter
         itemAttrs.addAttribute("","",ItemXMLConstants.MAIN_LEGACY_COMBAT_PROPERTY_MOD_LEVEL_ATTR,XmlWriter.CDATA,String.valueOf(combatPropertyModLevel));
       }
     }
-    if (item instanceof CarryAll)
+    else if (item instanceof CarryAll)
     {
       CarryAll carryAll=(CarryAll)item;
       // Max items
@@ -312,6 +321,12 @@ public class ItemXMLWriter
       // Item stack max
       int itemStackMax=carryAll.getItemStackMax();
       itemAttrs.addAttribute("","",ItemXMLConstants.CARRY_ALL_ITEM_STACK_MAX_ATTR,XmlWriter.CDATA,String.valueOf(itemStackMax));
+    }
+    else if (item instanceof Essence)
+    {
+      Essence essence=(Essence)item;
+      int type=essence.getType().getCode();
+      itemAttrs.addAttribute("","",ItemXMLConstants.ESSENCE_TYPE_ATTR,XmlWriter.CDATA,String.valueOf(type));
     }
     hd.startElement("","",ItemXMLConstants.ITEM_TAG,itemAttrs);
 

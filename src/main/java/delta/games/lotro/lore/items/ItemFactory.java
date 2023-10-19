@@ -3,7 +3,9 @@ package delta.games.lotro.lore.items;
 import org.apache.log4j.Logger;
 
 import delta.games.lotro.lore.items.carryalls.CarryAll;
+import delta.games.lotro.lore.items.essences.Essence;
 import delta.games.lotro.lore.items.essences.EssencesSet;
+import delta.games.lotro.lore.items.essences.EssencesSlotsSetup;
 import delta.games.lotro.lore.items.legendary.LegaciesManager;
 import delta.games.lotro.lore.items.legendary.Legendary;
 import delta.games.lotro.lore.items.legendary.LegendaryAttrs;
@@ -68,6 +70,10 @@ public class ItemFactory
     else if (category==ItemCategory.CARRY_ALL)
     {
       ret=new CarryAll();
+    }
+    else if (category==ItemCategory.ESSENCE)
+    {
+      ret=new Essence();
     }
     else
     {
@@ -176,7 +182,8 @@ public class ItemFactory
     int nbEssenceSlots=item.getEssenceSlots();
     if (nbEssenceSlots>0)
     {
-      EssencesSet essences=new EssencesSet(nbEssenceSlots);
+      EssencesSlotsSetup setup=item.getEssenceSlotsSetup();
+      EssencesSet essences=new EssencesSet(setup);
       itemInstance.setEssences(essences);
     }
     // Compute automatic stats
