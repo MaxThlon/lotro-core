@@ -3,6 +3,7 @@ package delta.games.lotro.config;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Path;
 
 import org.apache.log4j.Logger;
 
@@ -12,6 +13,7 @@ import delta.common.utils.misc.Preferences;
 import delta.common.utils.misc.TypedProperties;
 import delta.common.utils.url.URLTools;
 import delta.games.lotro.config.labels.LabelsConfiguration;
+import delta.games.lotro.config.path.CompanionApplicationPathConfiguration;
 
 /**
  * Configuration.
@@ -21,6 +23,7 @@ public final class LotroCoreConfig
 {
   private static final Logger LOGGER=Logger.getLogger(LotroCoreConfig.class);
 
+  // Instance
   private static LotroCoreConfig _instance=new LotroCoreConfig();
 
   // Locations
@@ -33,8 +36,8 @@ public final class LotroCoreConfig
   // Preferences
   private Preferences _preferences;
 
-  // Data Configuration
-  private DataConfiguration _dataConfiguration;
+  // Paths
+  private CompanionApplicationPathConfiguration _appPathConfiguration;
 
   // Labels Configuration
   private LabelsConfiguration _labelsConfiguration;
@@ -97,8 +100,12 @@ public final class LotroCoreConfig
     // Preferences
     File preferencesDir=new File(userDataDir,"preferences");
     _preferences=new Preferences(preferencesDir);
-    // Data Configuration
-    _dataConfiguration=initDataConfiguration(userDataDir);
+    // Application path configuration
+    _appPathConfiguration=initAppPathConfiguration(
+        _rootDir.toPath(),
+        userDataDir.toPath().getParent(),
+        userDataDir.toPath()
+    );
     // Labels Configuration
     _labelsConfiguration=initLabelsConfiguration(userDataDir);
   }
@@ -162,9 +169,12 @@ public final class LotroCoreConfig
     return userDataDir;
   }
 
-  private DataConfiguration initDataConfiguration(File userDataDir)
+  private CompanionApplicationPathConfiguration initAppPathConfiguration(Path path,
+                                                                       Path userPath,
+                                                                       Path userDataPath)
   {
-    DataConfiguration cfg=new DataConfiguration(userDataDir);
+    CompanionApplicationPathConfiguration cfg=new CompanionApplicationPathConfiguration(userPath, userPath);
+    cfg.setPath(path);
     cfg.fromPreferences(_preferences);
     return cfg;
   }
@@ -186,12 +196,21 @@ public final class LotroCoreConfig
   }
 
   /**
+   * Get the application path configuration.
+   * @return the application path configuration.
+   */
+  public CompanionApplicationPathConfiguration getAppPathConfiguration()
+  {
+    return _appPathConfiguration;
+  }
+
+  /**
    * Get the data configuration.
    * @return the data configuration.
    */
   public DataConfiguration getDataConfiguration()
   {
-    return _dataConfiguration;
+    return _appPathConfiguration.getDataConfiguration();
   }
 
   /**
