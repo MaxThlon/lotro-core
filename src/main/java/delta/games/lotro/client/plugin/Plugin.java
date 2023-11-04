@@ -51,10 +51,6 @@ public class Plugin {
    */
   public Information _information;
   /**
-   * ApartmentName
-   */
-  public String _apartmentName;
-  /**
    * Package
    */
   public String _package;
@@ -69,13 +65,11 @@ public class Plugin {
 
   /**
    * @param information .
-   * @param apartmentName .
    * @param packageName .
    * @param configuration .
    */
-  public Plugin(Information information, String apartmentName, String packageName, Configuration configuration) {
+  public Plugin(Information information, String packageName, Configuration configuration) {
     _information=information;
-    _apartmentName=apartmentName;
     _package=packageName;
     _configuration=configuration;
     _context=new SimpleContextImpl();

@@ -1,9 +1,7 @@
 package delta.games.lotro.client.plugin.io.xml;
 
 import java.io.File;
-import java.io.IOException;
 
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 
 import delta.common.utils.xml.DOMParsingTools;
@@ -24,10 +22,8 @@ public class PluginXMLParser
    * Parse a plugin descriptions XML file.
    * @param source Source file.
    * @return A Plugin.
-   * @throws IOException 
-   * @throws DOMException 
    */
-  public Plugin parsePluginData(File source, String apartmentName)
+  public Plugin parsePluginData(File source)
   {
     Element root=DOMParsingTools.parse(source);
     if (root!=null) {
@@ -49,7 +45,6 @@ public class PluginXMLParser
             (DescriptionElem!=null)?DescriptionElem.getTextContent():null,
             (ImageElem!=null)?ImageElem.getTextContent():null
           ),
-          apartmentName,
           (packageElem!=null)?packageElem.getTextContent():null,          
           (configurationElem==null)?null:
             new Plugin.Configuration(
