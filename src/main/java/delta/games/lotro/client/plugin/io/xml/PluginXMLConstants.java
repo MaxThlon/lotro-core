@@ -43,8 +43,4 @@ public class PluginXMLConstants
    * Tag 'Configuration'.
    */
   public static final String CONFIGURATION_TAG="Configuration";
-  /**
-   * Tag 'Configuration', attribute 'Apartment'.
-   */
-  public static final String CONFIGURATION_APARTMENT_ATTR="Apartment";
 }

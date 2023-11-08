@@ -1,5 +1,7 @@
 package delta.games.lotro.client.plugin;
 
+import java.util.Map;
+
 import delta.common.utils.context.Context;
 import delta.common.utils.context.SimpleContextImpl;
 
@@ -27,48 +29,30 @@ public class Plugin {
       _name=name; _author=author; _version=version; _description=description; _image=image;
      }
   }
-  
-  /**
-   * Configuration
-   * @author MaxThlon
-   */
-  public static class Configuration {
-    /**
-     * Apartment
-     */
-    public String _apartment;
-
-    /**
-     * @param apartment
-     */
-    public Configuration(String apartment) {
-      _apartment=apartment;
-     }
-  }
 
   /**
    * Information
    */
-  public Information _information;
+  private Information _information;
   /**
    * Package
    */
-  public String _package;
+  private String _package;
   /**
    * Configuration
    */
-  public Configuration _configuration;
+  private Map<String, String> _configuration;
   /**
-   * Configuration
+   * Context
    */
-  public Context _context;
+  private Context _context;
 
   /**
    * @param information .
    * @param packageName .
    * @param configuration .
    */
-  public Plugin(Information information, String packageName, Configuration configuration) {
+  public Plugin(Information information, String packageName, Map<String, String> configuration) {
     _information=information;
     _package=packageName;
     _configuration=configuration;
@@ -83,16 +67,23 @@ public class Plugin {
   }
   
   /**
-   * @return plugin package name.
+   * @return plugin package.
    */
-  public String getPackageName() {
+  public String getPackage() {
     return _package;
   }
   
   /**
    * @return plugin configuration.
    */
-  public Configuration getConfiguration() {
+  public Map<String, String> getConfiguration() {
     return _configuration;
+  }
+  
+  /**
+   * @return Context .
+   */
+  public Context getContext() {
+    return _context;
   }
 }

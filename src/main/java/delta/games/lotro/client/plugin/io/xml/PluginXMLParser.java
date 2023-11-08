@@ -1,8 +1,10 @@
 package delta.games.lotro.client.plugin.io.xml;
 
 import java.io.File;
+import java.util.HashMap;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import delta.common.utils.xml.DOMParsingTools;
 import delta.games.lotro.client.plugin.Plugin;
@@ -47,9 +49,12 @@ public class PluginXMLParser
           ),
           (packageElem!=null)?packageElem.getTextContent():null,          
           (configurationElem==null)?null:
-            new Plugin.Configuration(
-                DOMParsingTools.getStringAttribute(configurationElem.getAttributes(),PluginXMLConstants.CONFIGURATION_APARTMENT_ATTR,null)
-            )
+            new HashMap<String, String>(){{
+              for (int i=0; i!= configurationElem.getAttributes().getLength(); i++) {
+                Node node = configurationElem.getAttributes().item(i);
+                put(node.getNodeName(), node.getNodeValue());
+              }
+            }}
       );
     }
     return null;
